@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "2ocYUr/8gncAlbBKuDiDuBDOWVr46uQySbNI872Jpn1HxRoUOoGpr+hw2/tKuohby22iiRPqeGoq+A8ndV45VQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Student\\workspace\\personal-projects\\Weather_App\\Weather_App.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Student\\.nuget\\packages\\restsharp\\110.2.0\\restsharp.110.2.0.nupkg.sha512",
+    "C:\\Users\\Student\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\Student\\.nuget\\packages\\system.text.encodings.web\\7.0.0\\system.text.encodings.web.7.0.0.nupkg.sha512",
+    "C:\\Users\\Student\\.nuget\\packages\\system.text.json\\7.0.2\\system.text.json.7.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
