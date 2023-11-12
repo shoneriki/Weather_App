@@ -6,41 +6,36 @@ namespace Weather_App
 {
     public class Program
     {
+
         static async Task Main(string[] args)
         {
             WeatherApiCall apiCall = new WeatherApiCall();
 
-            var latLngCoords = apiCall.GetCoordinates("Cleveland, OH");
-
-            if (latLngCoords.HasValue)
+            try
             {
-                //double latitude = latLngCoords.Value.Lat;
-                //double longitude = latLngCoords.Value.Lng;
+                string cityName = "Cleveland, OH"; 
+                Forecast forecast = await apiCall.FetchForecastForCity(cityName);
 
-                int latitude = 83;
-                int longitude = 65;
-                string office = "CLE";
-
-                Forecast forecast = await apiCall.FetchHourlyForecast(office, latitude, longitude);
-
-                if (forecast != null && forecast.Properties != null)
+                if (forecast != null && forecast.Properties != null && forecast.Properties.Periods != null)
                 {
-                        foreach (var period in forecast.Properties.Periods)
-                        {
-                            int tempCelsius = (period.Temperature - 32) * 5 / 9;
-                            Console.WriteLine($"Time: {period.StartTime} => {tempCelsius}°C / {period.Temperature}°F  => {period.ShortForecast }");
-                        }
-            
+                    foreach (var period in forecast.Properties.Periods)
+                    {
+                        double tempCelsius = (period.Temperature - 32) * 5 / 9.0;
+                        Console.WriteLine($"Time: {period.StartTime}, " +
+                                          $"Temp: {period.Temperature}°F / {tempCelsius:0.0}°C, " +
+                                          $"Forecast: {period.ShortForecast}");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("I apologize, forecast data is not available it seems.");
+                    Console.WriteLine("Forecast data is not available.");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("I'm sorry, we failed to get coordinates.");
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
+
     }
 }
