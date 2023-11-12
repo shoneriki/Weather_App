@@ -29,8 +29,7 @@ namespace Weather_App
         public string TemperatureUnit
         {
             get; set;
-
-
         }
+        public string? ShortForecast { get; set; }
     }
 }

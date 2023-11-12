@@ -25,10 +25,12 @@ namespace Weather_App
 
                 if (forecast != null && forecast.Properties != null)
                 {
-                    foreach (var period in forecast.Properties.Periods)
-                    {
-                        Console.WriteLine($"Time: {period.StartTime} => Temp: {period.Temperature} {period.TemperatureUnit}");
-                    }
+                        foreach (var period in forecast.Properties.Periods)
+                        {
+                            int tempCelsius = (period.Temperature - 32) * 5 / 9;
+                            Console.WriteLine($"Time: {period.StartTime} => {tempCelsius}°C / {period.Temperature}°F  => {period.ShortForecast }");
+                        }
+            
                 }
                 else
                 {
