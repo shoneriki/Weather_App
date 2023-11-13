@@ -77,6 +77,69 @@ namespace Weather_App
             return todayForecasts;
         }
 
+        public async Task ListConditionsAndAdvice(string cityName)
+        {
+            try
+            {
+                var forecastPeriods = await FetchForecastForCity(cityName);
+
+                if (forecastPeriods == null || forecastPeriods.Count == 0)
+                {
+                    Console.WriteLine("Forecast data is not available.");
+                    return;
+                }
+
+                // Processing and displaying the forecast information
+                ProcessAndDisplayForecast(forecastPeriods);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private void ProcessAndDisplayForecast(List<ForecastPeriod> forecastPeriods)
+        {
+            foreach (var period in forecastPeriods)
+            {
+                double tempCelsius = ConvertFahrenheitToCelsius(period.Temperature);
+                string advice = GetWeatherAdvice(period, tempCelsius);
+
+                // Displaying the range of temperatures and conditions
+                Console.WriteLine($"Time: {period.StartTime}, " +
+                                  $"Temp: {period.Temperature}°F / {tempCelsius:0.0}°C, " +
+                                  $"Forecast: {period.ShortForecast}, " +
+                                  $"Advice: {advice}");
+            }
+        }
+
+        private double ConvertFahrenheitToCelsius(int temperatureF)
+        {
+            return (temperatureF - 32) * 5 / 9.0;
+        }
+
+        private string GetWeatherAdvice(ForecastPeriod period, double tempCelsius)
+        {
+            var adviceBuilder = new StringBuilder();
+
+            // Advice based on rain conditions
+            if (period.ShortForecast.Contains("Rain", StringComparison.OrdinalIgnoreCase))
+            {
+                adviceBuilder.AppendLine("Carry an umbrella or wear a raincoat.");
+            }
+
+            // Advice based on temperature
+            if (tempCelsius < 10)
+            {
+                adviceBuilder.AppendLine("Wear a heavy jacket.");
+            }
+            else if (tempCelsius < 20)
+            {
+                adviceBuilder.AppendLine("Consider a light jacket.");
+            }
+
+            return adviceBuilder.ToString().Trim();
+        }
 
 
 
