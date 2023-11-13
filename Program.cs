@@ -13,12 +13,12 @@ namespace Weather_App
 
             try
             {
-                string cityName = "Cleveland, OH"; 
-                Forecast forecast = await apiCall.FetchForecastForCity(cityName);
+                string cityName = "Cleveland, OH";
+                var forecastPeriods = await apiCall.FetchForecastForCity(cityName);
 
-                if (forecast != null && forecast.Properties != null && forecast.Properties.Periods != null)
+                if (forecastPeriods != null && forecastPeriods.Count > 0)
                 {
-                    foreach (var period in forecast.Properties.Periods)
+                    foreach (var period in forecastPeriods)
                     {
                         double tempCelsius = (period.Temperature - 32) * 5 / 9.0;
                         Console.WriteLine($"Time: {period.StartTime}, " +
@@ -36,6 +36,7 @@ namespace Weather_App
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
+
 
     }
 }

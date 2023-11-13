@@ -28,7 +28,7 @@ namespace Weather_App
 
             return null;
         }
-        public async Task<Gridpoint> GetGridpoint(double latitude, double longitude)
+        public async Task<GridpointResponse> GetGridpoint(double latitude, double longitude)
         {
             RestClient client = new RestClient(BaseUrl);
             RestRequest request = new RestRequest($"/points/{latitude},{longitude}");
@@ -37,12 +37,7 @@ namespace Weather_App
             var response = await client.GetAsync<GridpointResponse>(request);
             if (response != null && response.Properties != null)
             {
-                return new Gridpoint
-                {
-                    OfficeId = response.Properties.GridId,
-                    GridX = response.Properties.GridX,
-                    GridY = response.Properties.GridY
-                };
+                return response;
             }
             else
             {
@@ -50,47 +45,61 @@ namespace Weather_App
             }
         }
 
-        public async Task<Forecast> FetchHourlyForecast(string officeId, int gridX, int gridY)
+
+        public async Task<List<ForecastPeriod>> FetchHourlyForecastForToday(string officeId, int gridX, int gridY)
         {
             RestClient client = new RestClient(BaseUrl);
-
             RestRequest request = new RestRequest($"/gridpoints/{officeId}/{gridX},{gridY}/forecast/hourly");
             request.AddHeader("User-Agent", "Weather_App (ikirenohs@gmail.com)");
 
-            // GetAsync<Forecast> returns a Forecast object directly
-            var forecast = await client.GetAsync<Forecast>(request);
-
-            if (forecast != null)
-            {
-                return forecast;
-            }
-            else
+            var fullForecast = await client.GetAsync<Forecast>(request);
+            if (fullForecast == null || fullForecast.Properties == null)
             {
                 throw new Exception("Error retrieving weather data.");
             }
+
+            // Filter for the current day
+            DateTime now = DateTime.Now;
+            DateTime startOfToday = new DateTime(now.Year, now.Month, now.Day);
+            DateTime startOfTomorrow = startOfToday.AddDays(1);
+
+            var todayForecasts = new List<ForecastPeriod>();
+
+            // Loop through each forecast period and add to the new list if it's for today
+            foreach (var period in fullForecast.Properties.Periods)
+            {
+                if (period.StartTime >= startOfToday && period.StartTime < startOfTomorrow)
+                {
+                    todayForecasts.Add(period);
+                }
+            }
+
+            return todayForecasts;
         }
 
 
-        public async Task<Forecast> FetchForecastForCity(string cityName)
+
+
+        public async Task<List<ForecastPeriod>> FetchForecastForCity(string cityName)
         {
-            // Step 1: We get the latitude and longitude of the city
             var latLngCoords = GetCoordinates(cityName);
             if (!latLngCoords.HasValue)
             {
                 throw new Exception("Unable to get coordinates for the city.");
             }
 
-            // Step 2: we use the latitude and longitude to get the office and gridpoints
-            var gridpoint = await GetGridpoint(latLngCoords.Value.Lat, latLngCoords.Value.Lng);
-            if (gridpoint == null)
+            var gridpointResponse = await GetGridpoint(latLngCoords.Value.Lat, latLngCoords.Value.Lng);
+            if (gridpointResponse == null || gridpointResponse.Properties == null)
             {
                 throw new Exception("Unable to get gridpoint information from coordinates.");
             }
 
-            // Step 3: Fetch the weather data using the office and gridpoints
-            var forecast = await FetchHourlyForecast(gridpoint.OfficeId, gridpoint.GridX, gridpoint.GridY);
+            var forecast = await FetchHourlyForecastForToday(gridpointResponse.Properties.GridId, gridpointResponse.Properties.GridX, gridpointResponse.Properties.GridY);
             return forecast;
         }
+
+
+
 
 
     }
