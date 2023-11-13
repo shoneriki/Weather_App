@@ -10,10 +10,11 @@ namespace Weather_App
         static async Task Main(string[] args)
         {
             WeatherApiCall apiCall = new WeatherApiCall();
+            WeatherDisplayService displayService = new WeatherDisplayService(apiCall);
 
-            string cityName = "Cleveland, OH";
-            await apiCall.ListConditionsAndAdvice(cityName);
+            await displayService.DisplayConditionsAndAdvice("Cleveland, OH");
         }
+
 
 
     }
